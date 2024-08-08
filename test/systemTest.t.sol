@@ -38,7 +38,7 @@ contract systemTest is Test {
 
     function testGetGasPrice() public {
         uint256 fee = generalOracle.estimateFee(arbChainSelector);
-        generalOracle.requestGasPrice{value: fee}(arbChainSelector);
+        generalOracle.getOldAndRequestNewGasPrice{value: fee}(arbChainSelector);
 
         // Simulate the gas price retrieval on Arbitrum
         uint256 arbitrumGasPrice = 50 gwei; // Example gas price
@@ -56,7 +56,7 @@ contract systemTest is Test {
         generalOracle.ccipReceive(message);
 
         // Now check the updated gas price
-        uint256 receivedGasPrice = generalOracle.getGasPrice(arbChainSelector);
+        uint256 receivedGasPrice = generalOracle.getOldGasPrice(arbChainSelector);
         console.log("Gas price received from ARB:", receivedGasPrice);
         assertEq(receivedGasPrice, arbitrumGasPrice, "Gas price mismatch");
     }

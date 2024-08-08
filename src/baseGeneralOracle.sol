@@ -24,7 +24,7 @@ contract baseGeneralOracle is Ownable {
         gasOracleAddresses[chainSelector] = gasOracleAddress;
     }
 
-    function requestGasPrice(uint64 chainSelector) external payable {
+    function getOldAndRequestNewGasPrice(uint64 chainSelector) external payable returns (uint256) {
         require(gasOracleAddresses[chainSelector] != address(0), "Gas oracle not set for this chain");
 
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
@@ -49,6 +49,7 @@ contract baseGeneralOracle is Ownable {
         }
 
         emit GasPriceRequestSent(chainSelector, messageId);
+        return chainGasPrices[chainSelector];
     }
 
     function ccipReceive(Client.Any2EVMMessage memory message) external {
@@ -59,7 +60,7 @@ contract baseGeneralOracle is Ownable {
         emit GasPriceUpdated(chainSelector, gasPrice);
     }
 
-    function getGasPrice(uint64 chainSelector) external view returns (uint256) {
+    function getOldGasPrice(uint64 chainSelector) external view returns (uint256) {
         return chainGasPrices[chainSelector];
     }
 
