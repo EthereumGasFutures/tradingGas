@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-//Contract to update the gas price and return it. It is built as a transaction that modify the state because some EVM return zero if there is no transaction broadcasted
+//Contract to update the gas price and return it. It is built as a transaction that modify the state because some EVM return zero if there is no transactions.
 contract gasOracle {
 
     uint256 public lastGasPrice;
