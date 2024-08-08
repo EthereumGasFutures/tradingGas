@@ -63,6 +63,23 @@ contract baseGeneralOracle is Ownable {
         return chainGasPrices[chainSelector];
     }
 
+    function estimateFee(uint64 chainSelector) public view returns (uint256){
+        require(gasOracleAddresses[chainSelector] != address(0), "Gas oracle not set for this chain");
+
+        Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
+            receiver: abi.encode(gasOracleAddresses[chainSelector]),
+            data: abi.encodeWithSignature("getGasPrice()"),
+            tokenAmounts: new Client.EVMTokenAmount[](0),
+            extraArgs: Client._argsToBytes(
+                Client.EVMExtraArgsV1({gasLimit: 200_000})
+            ),
+            feeToken: address(0) // Use native token (ETH) for fees
+        });
+
+        uint256 fee = i_router.getFee(chainSelector, message);
+        return fee;
+    }
+
     // Function to receive Ether. msg.data must be empty
     receive() external payable {}
 
