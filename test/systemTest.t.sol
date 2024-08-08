@@ -5,21 +5,29 @@ import {Test, console} from "forge-std/Test.sol";
 import {baseGeneralOracle} from "../src/baseGeneralOracle.sol";
 import {gasOracle} from "../src/gasOracle.sol";
 import "chainlink/contracts/src/v0.8/ccip/libraries/Client.sol";
+import "../src/interfaces.sol";
 
 contract systemTest is Test {
     baseGeneralOracle public generalOracle;
     gasOracle public localGasOracleContract;
     address immutable _baseRouter = 0x881e3A65B4d4a04dD529061dd0071cf975F58bCD;
+    address immutable _arbRouter = 0x141fa059441E0ca23ce184B6A78bafD2A517DdE8;
+    address immutable _opRouter = 0x3206695CaE29952f4b0c22a169725a865bc8Ce0f;
+
     uint64 arbChainSelector = 4949039107694359620;
     uint64 opChainSelector = 3734403246176062136;
 
-    address public gasOracleContractARB = 0x4ec5b3e934000C184e6c3Dda2baEEA5e9141ccC3;
-    address public gasOracleContractBASE = 0xD18A967cB98e2f249c156D6cdA1Ae6D675a46a4F;
+    address public gasOracleContractARB = 0x1410032621Daa7f188dbdc22021292d3F101846a;
+    address public gasOracleContractBASE = 0xeD257dcdC020d45F5B847aD6dD2AB7Cc07a510DD;
+    address public gasOracleContractOP = 0xF5B298825B38DA0F5825e339f24F2E35A6A18757;
+
+    address baseOracleContract = 0xF5B298825B38DA0F5825e339f24F2E35A6A18757;
 
     function setUp() public {
         generalOracle = new baseGeneralOracle(_baseRouter, msg.sender);
-        localGasOracleContract = new gasOracle();
+        localGasOracleContract = new gasOracle(_baseRouter);
         generalOracle.setGasOracleAddress( arbChainSelector, address(gasOracleContractARB) );
+        generalOracle.setGasOracleAddress( opChainSelector, address(gasOracleContractOP) );
         
         vm.deal(msg.sender, 10 ether);
     }
@@ -60,4 +68,18 @@ contract systemTest is Test {
         console.log("Gas price received from ARB:", receivedGasPrice);
         assertEq(receivedGasPrice, arbitrumGasPrice, "Gas price mismatch");
     }
+
+    function testRealGasPrices() public view {
+        uint256 fee = generalOracle.estimateFee(arbChainSelector);
+        uint256 gasArbitrum = IBaseGeneralOracle( baseOracleContract ).getOldGasPrice(arbChainSelector);
+        fee = generalOracle.estimateFee(opChainSelector);
+        uint256 gasOP = IBaseGeneralOracle( baseOracleContract ).getOldGasPrice(opChainSelector);
+
+        console.log("Gas arb: ", gasArbitrum);
+        console.log("Gas op: ", gasOP);
+
+        assertTrue(gasArbitrum > 0, "Either first time, or invalid");
+        assertTrue(gasOP > 0, "Either first time, or invalid");
+    }
+
 }

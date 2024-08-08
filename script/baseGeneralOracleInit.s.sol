@@ -3,10 +3,12 @@ pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
 import {baseGeneralOracle} from "../src/baseGeneralOracle.sol";
+import "../src/interfaces.sol";
 
-contract BaseGeneralOracleScript is Script {
+contract BaseGeneralOracleInitScript is Script {
     baseGeneralOracle public generalOracle;
     address immutable _baseRouter = 0x881e3A65B4d4a04dD529061dd0071cf975F58bCD;
+    address baseOracleContract = 0xF5B298825B38DA0F5825e339f24F2E35A6A18757;
 
     uint64 arbChainSelector = 4949039107694359620;
     uint64 opChainSelector = 3734403246176062136;
@@ -24,9 +26,17 @@ contract BaseGeneralOracleScript is Script {
 
         address derivedAddress = vm.addr(deployerPrivateKey);
         console.log("Derived address from private key:", derivedAddress);
-        generalOracle = new baseGeneralOracle(_baseRouter, msg.sender);
-        generalOracle.setGasOracleAddress( arbChainSelector, address(gasOracleContractARB) );
-        generalOracle.setGasOracleAddress( opChainSelector, address(gasOracleContractOP) );
+
+        IBaseGeneralOracle( baseOracleContract ).setGasOracleAddress( arbChainSelector, address(gasOracleContractARB) );
+        IBaseGeneralOracle( baseOracleContract ).setGasOracleAddress( opChainSelector, address(gasOracleContractOP) );
+
+        uint256 fee = IBaseGeneralOracle( baseOracleContract ).estimateFee(arbChainSelector);
+        uint256 gasArbitrum = IBaseGeneralOracle( baseOracleContract ).getOldAndRequestNewGasPrice{value: fee}(arbChainSelector);
+        fee = IBaseGeneralOracle( baseOracleContract ).estimateFee(opChainSelector);
+        uint256 gasOP = IBaseGeneralOracle( baseOracleContract ).getOldAndRequestNewGasPrice{value: fee}(opChainSelector);
+
+        console.log("Gas arb: ", gasArbitrum);
+        console.log("Gas op: ", gasOP);
 
         vm.stopBroadcast();
     }
