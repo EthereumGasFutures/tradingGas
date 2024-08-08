@@ -3,11 +3,12 @@ pragma solidity ^0.8.0;
 
 import "chainlink/contracts/src/v0.8/ccip/libraries/Client.sol";
 import "chainlink/contracts/src/v0.8/ccip/interfaces/IRouterClient.sol";
+import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract trading {
+contract baseGeneralOracle is Ownable {
     using Client for Client.EVM2AnyMessage;
 
-    IRouterClient public immutable i_router;
+    IRouterClient immutable i_router;
     mapping(uint64 => address) public gasOracleAddresses;
     mapping(uint64 => uint256) public chainGasPrices;
     mapping(bytes32 => uint64) public messageIdToChainSelector;
@@ -15,7 +16,7 @@ contract trading {
     event GasPriceRequestSent(uint64 chainSelector, bytes32 messageId);
     event GasPriceUpdated(uint64 chainSelector, uint256 gasPrice);
 
-    constructor(address _router) {
+    constructor(address _router, address newOwner) Ownable(newOwner) {
         i_router = IRouterClient(_router);
     }
 
@@ -29,11 +30,11 @@ contract trading {
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
             receiver: abi.encode(gasOracleAddresses[chainSelector]),
             data: abi.encodeWithSignature("getGasPrice()"),
-            tokenAmounts: new Client.TokenAmount[](0),
+            tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
-                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: 200_000})
             ),
-            feeToken: address(0) // Use native gas token (ETH)
+            feeToken: address(0) // Use native token (ETH) for fees
         });
 
         uint256 fee = i_router.getFee(chainSelector, message);
@@ -50,7 +51,7 @@ contract trading {
         emit GasPriceRequestSent(chainSelector, messageId);
     }
 
-    function _ccipReceive(Client.Any2EVMMessage memory message) internal {
+    function ccipReceive(Client.Any2EVMMessage memory message) external {
         uint64 chainSelector = message.sourceChainSelector;
         (uint256 gasPrice) = abi.decode(message.data, (uint256));
         

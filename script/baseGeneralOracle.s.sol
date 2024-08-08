@@ -2,10 +2,11 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {trading} from "../src/trading.sol";
+import {baseGeneralOracle} from "../src/baseGeneralOracle.sol";
 
-contract TradingScript is Script {
-    trading public tradingSystem;
+contract BaseGeneralOracleScript is Script {
+    baseGeneralOracle public generalOracle;
+    address immutable _baseRouter = 0x881e3A65B4d4a04dD529061dd0071cf975F58bCD;
 
     function setUp() public {
     }
@@ -16,7 +17,7 @@ contract TradingScript is Script {
 
         address derivedAddress = vm.addr(deployerPrivateKey);
         console.log("Derived address from private key:", derivedAddress);
-        tradingSystem = new trading(msg.sender);
+        generalOracle = new baseGeneralOracle(_baseRouter, msg.sender);
 
         vm.stopBroadcast();
     }
