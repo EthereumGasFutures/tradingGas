@@ -4,3 +4,13 @@ out = "out"
 libs = ["lib"]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+[rpc_endpoints]
+arbitrum_one = "${ARBITRUM_ONE_RPC_URL}"
+base = "${BASE_RPC_URL}"
+ethereum = "${ETHEREUM_RPC_URL}"
+
+[etherscan]
+arbitrum_one = { key = "${ARBISCAN_API_KEY}", url = "https://api.arbiscan.io/api" }
+ethereum = { key = "${ETHERSCAN_API_KEY}", url = "https://api.etherscan.io/api" }
+base = { key = "${BASESCAN_API_KEY}", url = "https://api.basescan.org" }
