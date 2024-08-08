@@ -12,13 +12,20 @@ contract GasOracleScript is Script {
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        address deployerAddress = vm.addr(deployerPrivateKey);
+        console.log("Deployer address derived from private key:", deployerAddress);
+
+        // Fetch the current nonce from the blockchain
+        uint64 nonce = vm.getNonce(deployerAddress);
+        console.log("Current nonce:", nonce);
+        
+        // Set the broadcast with the fetched nonce
         vm.startBroadcast(deployerPrivateKey);
 
-        address derivedAddress = vm.addr(deployerPrivateKey);
-        console.log("Derived address from private key:", derivedAddress);
+        // Deploy the contract
         chainOracle = new gasOracle();
-        console.log( "Contract address: ", address(chainOracle) );
-        
+        console.log("Deployed contract address:", address(chainOracle));
+
         vm.stopBroadcast();
     }
 }
