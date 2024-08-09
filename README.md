@@ -15,6 +15,12 @@ https://book.getfoundry.sh/
 
 ## Usage
 
+## Contract Addresses on Base
+
+`baseOracleContract: 0x1410032621Daa7f188dbdc22021292d3F101846a`
+
+`traderContract: 0x57a69AF5BA31ba5cf48bd636EdeeA80831774f59`
+
 ### Build
 
 ```shell

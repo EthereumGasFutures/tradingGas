@@ -27,7 +27,7 @@ contract TraderScript is Script {
         address derivedAddress = vm.addr(deployerPrivateKey);
         console.log("Derived address from private key:", derivedAddress);
 
-        traderContract = new trader(msg.sender, baseOracleContract);
+        traderContract = new trader(derivedAddress, baseOracleContract);
         traderContract.setBaseOracleContract(baseOracleContract);
 
         erc20base = new erc20init(address(traderContract), "baseGIX", "Gas Token on Base");
@@ -37,6 +37,8 @@ contract TraderScript is Script {
         traderContract.setTokenAddress(15971525489660198786, address(erc20base));
         traderContract.setTokenAddress(4949039107694359620, address(erc20arb));
         traderContract.setTokenAddress(3734403246176062136, address(erc20op));
+
+        console.log("Trader contract: ", address(traderContract));
 
         vm.stopBroadcast();
     }
