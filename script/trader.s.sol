@@ -11,7 +11,7 @@ contract TraderScript is Script {
     uint64[] chainSelectors = [4949039107694359620, 3734403246176062136,  15971525489660198786];
     address[] gasOracleContracts = [0x4ec5b3e934000C184e6c3Dda2baEEA5e9141ccC3, 0x7Fbc0146036526AB1c7B8bcD2BA8b03253646f31, 0xD18A967cB98e2f249c156D6cdA1Ae6D675a46a4F];
 
-    address baseOracleContract = 0xF5B298825B38DA0F5825e339f24F2E35A6A18757;
+    address baseOracleContract = 0x1410032621Daa7f188dbdc22021292d3F101846a;
 
     function setUp() public {}
 

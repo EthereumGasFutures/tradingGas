@@ -8,7 +8,7 @@ import "../src/interfaces.sol";
 contract GasOracleUpdateScript is Script {
     baseGeneralOracle public generalOracle;
     address immutable _baseRouter = 0x881e3A65B4d4a04dD529061dd0071cf975F58bCD;
-    address baseOracleContract = 0x3CD1Ea9586D60740c7Ab9e62CA74833090429E39;
+    address baseOracleContract = 0x1410032621Daa7f188dbdc22021292d3F101846a;
 
     uint64 arbChainSelector = 4949039107694359620;
     uint64 opChainSelector = 3734403246176062136;

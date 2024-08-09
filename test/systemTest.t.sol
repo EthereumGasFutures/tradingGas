@@ -21,7 +21,7 @@ contract systemTest is Test {
     address public gasOracleContractBASE = 0xeD257dcdC020d45F5B847aD6dD2AB7Cc07a510DD;
     address public gasOracleContractOP = 0xF5B298825B38DA0F5825e339f24F2E35A6A18757;
 
-    address baseOracleContract = 0xF5B298825B38DA0F5825e339f24F2E35A6A18757;
+    address baseOracleContract = 0x1410032621Daa7f188dbdc22021292d3F101846a;
 
     function setUp() public {
         generalOracle = new baseGeneralOracle(_baseRouter, msg.sender);
@@ -71,9 +71,9 @@ contract systemTest is Test {
 
     function testRealGasPrices() public view {
         uint256 fee = generalOracle.estimateFee(arbChainSelector);
-        uint256 gasArbitrum = IBaseGeneralOracle( baseOracleContract ).getOldGasPrice(arbChainSelector);
+        uint256 gasArbitrum = IBaseGeneralOracle( baseOracleContract ).getAvailableGasPrice(arbChainSelector);
         fee = generalOracle.estimateFee(opChainSelector);
-        uint256 gasOP = IBaseGeneralOracle( baseOracleContract ).getOldGasPrice(opChainSelector);
+        uint256 gasOP = IBaseGeneralOracle( baseOracleContract ).getAvailableGasPrice(opChainSelector);
 
         console.log("Gas arb: ", gasArbitrum);
         console.log("Gas op: ", gasOP);

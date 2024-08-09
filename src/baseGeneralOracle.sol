@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "chainlink/contracts/src/v0.8/ccip/libraries/Client.sol";
 import "chainlink/contracts/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
+import "chainlink/contracts/src/v0.8/ccip/interfaces/IPriceRegistry.sol";
 
 contract baseGeneralOracle is Ownable {
     using Client for Client.EVM2AnyMessage;
@@ -12,6 +13,8 @@ contract baseGeneralOracle is Ownable {
     mapping(uint64 => address) public gasOracleAddresses;
     mapping(uint64 => uint256) public chainGasPrices;
     mapping(bytes32 => uint64) public messageIdToChainSelector;
+
+    address priceFeedAddress = 0x6337a58D4BD7Ba691B66341779e8f87d4679923a;
 
     event GasPriceRequestSent(uint64 chainSelector, bytes32 messageId);
     event GasPriceUpdated(uint64 chainSelector, uint256 gasPrice);
@@ -64,6 +67,11 @@ contract baseGeneralOracle is Ownable {
         return chainGasPrices[chainSelector];
     }
 
+    function getAvailableGasPrice(uint64 chainSelector) external view returns (uint256) {
+        (, uint224 gasPrice) = IPriceRegistry(priceFeedAddress).getTokenAndGasPrices(0x4200000000000000000000000000000000000006, chainSelector);
+        return uint256(uint112(gasPrice));
+    }
+
     function estimateFee(uint64 chainSelector) public view returns (uint256){
         require(gasOracleAddresses[chainSelector] != address(0), "Gas oracle not set for this chain");
 
@@ -79,6 +87,10 @@ contract baseGeneralOracle is Ownable {
 
         uint256 fee = i_router.getFee(chainSelector, message);
         return fee;
+    }
+
+    function changePriceFeedAddress(address newPriceFeedAddress) public onlyOwner {
+        priceFeedAddress = newPriceFeedAddress;
     }
 
     // Function to receive Ether. msg.data must be empty
