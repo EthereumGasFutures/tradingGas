@@ -3,9 +3,14 @@ pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
 import {trader} from "../src/trader.sol";
+import {erc20init} from "../src/erc20init.sol";
+import {erc20init} from "../src/erc20init.sol";
 
 contract TraderScript is Script {
     trader public traderContract;
+    erc20init public erc20base;
+    erc20init public erc20arb;
+    erc20init public erc20op;
 
     //arb, op, base
     uint64[] chainSelectors = [4949039107694359620, 3734403246176062136,  15971525489660198786];
@@ -22,8 +27,16 @@ contract TraderScript is Script {
         address derivedAddress = vm.addr(deployerPrivateKey);
         console.log("Derived address from private key:", derivedAddress);
 
-        traderContract = new trader(msg.sender);
+        traderContract = new trader(msg.sender, baseOracleContract);
         traderContract.setBaseOracleContract(baseOracleContract);
+
+        erc20base = new erc20init(address(traderContract), "baseGIX", "Gas Token on Base");
+        erc20arb = new erc20init(address(traderContract), "arbGIX", "Gas Token on Arbitrum");
+        erc20op = new erc20init(address(traderContract), "opGIX", "Gas Token on Optimism");
+
+        traderContract.setTokenAddress(15971525489660198786, address(erc20base));
+        traderContract.setTokenAddress(4949039107694359620, address(erc20arb));
+        traderContract.setTokenAddress(3734403246176062136, address(erc20op));
 
         vm.stopBroadcast();
     }
